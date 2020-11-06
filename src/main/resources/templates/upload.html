@@ -20,6 +20,10 @@
                         <input class="file-path validate" type="text">
                     </div>
                 </div>
+                <div class="input-field">
+                    <label>Version: </label>
+                    <input type="text" name="verion" id = "version">
+                </div>
                 <button class="waves-effect waves-light btn" type="button" id="button-submit">Обработать</button>
             </form>
             <div class="progress hide">
@@ -35,6 +39,7 @@
 
             const form = $('#form')[0];
             const data = new FormData(form);
+            data.append('version', $("#version").val())
             $.ajax({
                 type: 'POST',
                 enctype: 'multipart/form-data',

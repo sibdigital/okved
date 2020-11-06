@@ -17,9 +17,21 @@
             <div class="input-field col s1">
                 <button class="waves-effect waves-light btn" type="button" id="button-search">Найти</button>
             </div>
+            <button class="waves-effect waves-light btn-small" type="button" id="button-add">Добавить новый ОКВЭД</button>
         </div>
         <div class="row">
-            <div class="col s12" id="result"></div>
+            <div class="col s12" id="result2001">
+                <div class="waves-effect waves-light collection-header" id = "title2001">ОКВЭД 2001</div>
+                <div class="collection" id="collection2001"></div>
+            </div>
+            <div class="col s12" id="result2014">
+                <div class="waves-effect waves-light collection-header" id = "title2014">ОКВЭД 2014</div>
+                <div class="collection" id="collection2014"></div>
+            </div>
+            <div class="col s12" id="resultSynt">
+                <div class="waves-effect waves-light collection-header" id = "titleSynt">Синтетические ОКВЭДы</div>
+                <div class="collection" id="collectionSynt"></div>
+            </div>
         </div>
     </div>
     <script>
@@ -34,20 +46,71 @@
         }
 
         function showSearchResult(data) {
-            $('#result').empty();
-            if (data && data.length > 0) {
-                let collection = $('<div>', { class: 'collection' });
-                data.forEach(element => {
-                    let item = $('<div>', { class: 'collection-item' });
-                    let span = $('<span>', { text: element.kindCode + ' ' + element.kindName });
-                    item.append(span);
-                    collection.append(item);
-                });
-                $('#result').append(collection);
-            } else {
-                $('#result').append('<div><span>Ничего не найдено :(</span></div>')
+            $('#collection2001').empty();
+            $('#collection2014').empty();
+            $('#collectionSynt').empty();
+            is2001empty = true;
+            is2014empty = true;
+            isSyntEmpty = true;
+
+            data.forEach(element => {
+                let item = $('<div>', { class: 'collection-item' });
+                let span = $('<span>', { text: element.kindCode + ' ' + element.kindName });
+                item.append(span);
+                if (element.version == '2001') {
+                    $('#collection2001').append(item);
+                    is2001empty = false;
+                }
+                else if (element.version == '2014') {
+                    $('#collection2014').append(item);
+                    is2014empty = false;
+                }
+                else if (element.version == 'synt') {
+                    $('#collectionSynt').append(item);
+                    isSyntEmpty = false;
+                }
+            });
+
+            if (is2001empty) {
+                $('#collection2001').append('<div><span>Ничего не найдено</span></div>')
+            }
+            if (is2014empty) {
+                $('#collection2014').append('<div><span>Ничего не найдено</span></div>')
+            }
+            if (isSyntEmpty) {
+                $('#collectionSynt').append('<div><span>Ничего не найдено</span></div>')
             }
         }
+
+        $('#button-add').click(function () {
+            window.open('/new_okved');
+        })
+
+        $("#title2001").click(function(){
+            if ($("#collection2001").is(":hidden")) {
+                $("#collection2001").slideDown();
+            }
+            else $("#collection2001").hide();
+
+        });
+
+        $("#title2014").click(function(){
+            if ($("#collection2014").is(":hidden")) {
+                $("#collection2014").slideDown();
+            }
+            else {
+                $("#collection2014").hide();
+            }
+        });
+
+        $("#titleSynt").click(function(){
+            if ($("#collectionSynt").is(":hidden")) {
+                $("#collectionSynt").slideDown();
+            }
+            else $("#collectionSynt").hide();
+
+        });
+
 
         $().ready(function () {
             search();

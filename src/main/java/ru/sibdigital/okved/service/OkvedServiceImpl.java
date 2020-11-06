@@ -13,6 +13,9 @@ import ru.sibdigital.okved.utils.ExcelParser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class OkvedServiceImpl implements OkvedService {
@@ -21,7 +24,7 @@ public class OkvedServiceImpl implements OkvedService {
     private OkvedRepo okvedRepo;
 
     @Transactional
-    public String processFile(MultipartFile multipartFile) {
+    public String processFile(MultipartFile multipartFile, String version) {
         try {
             // парсинг файла
             List<OkvedDto> dtos = ExcelParser.parseFile(multipartFile.getInputStream());
@@ -33,7 +36,9 @@ public class OkvedServiceImpl implements OkvedService {
             List<Okved> models = new ArrayList<>();
             for (OkvedDto dto: dtos) {
                 Okved newOkved = convertToOkved(dto);
-                Okved oldOkved = okvedRepo.findByKindCode(newOkved.getKindCode());
+                newOkved.setVersion(version);
+                newOkved.setPath(version + "." + newOkved.getKindCode());
+                Okved oldOkved = this.okvedRepo.findByPath(newOkved.getPath());
                 if (oldOkved == null) {
                     models.add(newOkved);
                 } else {
@@ -97,5 +102,68 @@ public class OkvedServiceImpl implements OkvedService {
     @Override
     public List<Okved> findOkvedsBySearchText(String text) {
         return okvedRepo.findBySearchText(text);
+    }
+
+
+    public String findLastSyntheticKindCode() {
+        return this.okvedRepo.findLastSyntheticKindCode();
+    }
+
+    public Okved findOkvedById(UUID id) {
+        return this.okvedRepo.findOkvedById(id);
+    }
+
+    public List<Okved> getSyntOkveds() {
+        return (List) StreamSupport.stream(this.okvedRepo.findOkvedsByVersion("synt").spliterator(), false).collect(Collectors.toList());
+    }
+
+    public String createOkved(String okvedName, String description) {
+        try {
+            Okved newOkved = new Okved();
+            newOkved.setKindName(okvedName);
+            newOkved.setDescription(description);
+            newOkved.setVersion("synt");
+            String lastSyntheticKindCode = this.findLastSyntheticKindCode();
+            String kindCode;
+            if (lastSyntheticKindCode != null) {
+                kindCode = "" + (Integer.parseInt(lastSyntheticKindCode) + 1);
+            } else {
+                kindCode = "1";
+            }
+
+            newOkved.setKindCode(kindCode);
+            newOkved.setPath("synt." + kindCode);
+            this.okvedRepo.save(newOkved);
+            this.okvedRepo.setTsVectorsById(newOkved.getId());
+            return "ОКВЭД добавлен.";
+        } catch (Exception var6) {
+            var6.printStackTrace();
+            return "Ошибка! Не удалось добавить ОКВЭД.";
+        }
+    }
+
+    public String saveOkved(String id, String okvedName, String description) {
+        try {
+            Okved okved = this.okvedRepo.findOkvedById(UUID.fromString(id));
+            okved.setKindName(okvedName);
+            okved.setDescription(description);
+            this.okvedRepo.save(okved);
+            this.okvedRepo.setTsVectorsById(okved.getId());
+            return "ОКВЭД изменен.";
+        } catch (Exception var5) {
+            var5.printStackTrace();
+            return "Ошибка! Не удалось изменить ОКВЭД.";
+        }
+    }
+
+    public String deleteOkved(String id) {
+        try {
+            Okved okved = this.okvedRepo.findOkvedById(UUID.fromString(id));
+            this.okvedRepo.delete(okved);
+            return "ОКВЭД удален.";
+        } catch (Exception var3) {
+            var3.printStackTrace();
+            return "Ошибка! Не удалось удалить ОКВЭД.";
+        }
     }
 }

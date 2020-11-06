@@ -5,7 +5,7 @@ public class OkvedDto {
     private String code;
     private String name;
     private String description;
-
+    private String version;
     private Short type;
     private String className;
     private String subclassName;
@@ -34,6 +34,14 @@ public class OkvedDto {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getVersion() {
+        return this.version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public String getClassName() {
