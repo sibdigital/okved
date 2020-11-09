@@ -104,17 +104,17 @@ public class OkvedServiceImpl implements OkvedService {
         return okvedRepo.findBySearchText(text);
     }
 
-
     public String findLastSyntheticKindCode() {
-        return this.okvedRepo.findLastSyntheticKindCode();
+        return okvedRepo.findLastSyntheticKindCode();
     }
 
     public Okved findOkvedById(UUID id) {
-        return this.okvedRepo.findOkvedById(id);
+        return okvedRepo.findOkvedById(id);
     }
 
     public List<Okved> getSyntOkveds() {
-        return (List) StreamSupport.stream(this.okvedRepo.findOkvedsByVersion("synt").spliterator(), false).collect(Collectors.toList());
+        return StreamSupport.stream(okvedRepo.findOkvedsByVersion("synt").spliterator(), false)
+                .collect(Collectors.toList());
     }
 
     public String createOkved(String okvedName, String description) {
@@ -123,7 +123,7 @@ public class OkvedServiceImpl implements OkvedService {
             newOkved.setKindName(okvedName);
             newOkved.setDescription(description);
             newOkved.setVersion("synt");
-            String lastSyntheticKindCode = this.findLastSyntheticKindCode();
+            String lastSyntheticKindCode = findLastSyntheticKindCode();
             String kindCode;
             if (lastSyntheticKindCode != null) {
                 kindCode = "" + (Integer.parseInt(lastSyntheticKindCode) + 1);
@@ -136,22 +136,22 @@ public class OkvedServiceImpl implements OkvedService {
             this.okvedRepo.save(newOkved);
             this.okvedRepo.setTsVectorsById(newOkved.getId());
             return "ОКВЭД добавлен.";
-        } catch (Exception var6) {
-            var6.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             return "Ошибка! Не удалось добавить ОКВЭД.";
         }
     }
 
     public String saveOkved(String id, String okvedName, String description) {
         try {
-            Okved okved = this.okvedRepo.findOkvedById(UUID.fromString(id));
+            Okved okved = okvedRepo.findOkvedById(UUID.fromString(id));
             okved.setKindName(okvedName);
             okved.setDescription(description);
-            this.okvedRepo.save(okved);
-            this.okvedRepo.setTsVectorsById(okved.getId());
+            okvedRepo.save(okved);
+            okvedRepo.setTsVectorsById(okved.getId());
             return "ОКВЭД изменен.";
-        } catch (Exception var5) {
-            var5.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             return "Ошибка! Не удалось изменить ОКВЭД.";
         }
     }
@@ -161,8 +161,8 @@ public class OkvedServiceImpl implements OkvedService {
             Okved okved = this.okvedRepo.findOkvedById(UUID.fromString(id));
             this.okvedRepo.delete(okved);
             return "ОКВЭД удален.";
-        } catch (Exception var3) {
-            var3.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             return "Ошибка! Не удалось удалить ОКВЭД.";
         }
     }
