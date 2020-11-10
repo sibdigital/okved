@@ -75,7 +75,10 @@
         }
 
         function addFoundData(data) {
-            var variables = {};
+            var variables = {'2001_is_empty': true,
+                             '2014_is_empty': true,
+                             'synt_is_empty': true,
+                            };
             data.forEach(function(element) {
                 if (['2001', '2014', 'synt'].includes(element.version)) {
                     let item = $('<a>', {class: 'collection-item', href: '/okved?id=' + element.id,
