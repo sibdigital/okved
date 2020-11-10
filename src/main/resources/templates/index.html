@@ -21,19 +21,18 @@
         </div>
         <div class="row">
             <div class="col s12" id="result2001">
-                <div class="waves-effect waves-light collection-header" id = "title2001">ОКВЭД 2001</div>
-                <div class="collection" id="collection2001"></div>
+                <div class="waves-effect waves-light collection-header" id = "title2001" onclick="hide_okveds('2001')">ОКВЭД 2001</div>
+                <div class="collection" id="c_2001"></div>
             </div>
             <div class="col s12" id="result2014">
-                <div class="waves-effect waves-light collection-header" id = "title2014">ОКВЭД 2014</div>
-                <div class="collection" id="collection2014"></div>
+                <div class="waves-effect waves-light collection-header" id = "title2014" onclick="hide_okveds('2014')">ОКВЭД 2014</div>
+                <div class="collection" id="c_2014"></div>
             </div>
             <div class="col s12" id="resultSynt">
-                <div class="waves-effect waves-light collection-header" id = "titleSynt">Синтетические ОКВЭДы</div>
-                <div class="collection" id="collectionSynt"></div>
+                <div class="waves-effect waves-light collection-header" id = "titleSynt" onclick="hide_okveds('synt')">Синтетические ОКВЭДы</div>
+                <div class="collection" id="c_synt"></div>
             </div>
         </div>
-        <div class="row">
     </div>
     <script>
         $('#button-search').click(function () {
@@ -47,72 +46,49 @@
         }
 
         function showSearchResult(data) {
-            $('#collection2001').empty();
-            $('#collection2014').empty();
-            $('#collectionSynt').empty();
-            is2001empty = true;
-            is2014empty = true;
-            isSyntEmpty = true;
-
-            data.forEach(element => {
-                // let item = $('<div>', { class: 'collection-item'});
-                // let span = $('<span>', { text: element.kindCode + ' ' + element.kindName });
-                // item.append(span);
-                let item = $('<a>', {class: 'collection-item', href: '/okved?id=' + element.id, text: element.kindCode + ' ' + element.kindName })
-                if (element.version == '2001') {
-                    $('#collection2001').append(item);
-                    is2001empty = false;
+            var collections = document.querySelectorAll('.collection');
+            var variables = {};
+            collections.forEach(function (node) {
+                while (node.hasChildNodes()) {
+                    node.removeChild(node.lastChild);
                 }
-                else if (element.version == '2014') {
-                    $('#collection2014').append(item);
-                    is2014empty = false;
-                }
-                else if (element.version == 'synt') {
-                    $('#collectionSynt').append(item);
-                    isSyntEmpty = false;
-                }
+                variables[node.id.substring(2) + "_is_empty"] = true;
             });
 
-            if (is2001empty) {
-                $('#collection2001').append('<div><span>Ничего не найдено</span></div>')
-            }
-            if (is2014empty) {
-                $('#collection2014').append('<div><span>Ничего не найдено</span></div>')
-            }
-            if (isSyntEmpty) {
-                $('#collectionSynt').append('<div><span>Ничего не найдено</span></div>')
+            data.forEach(function(element) {
+                if (['2001', '2014', 'synt'].includes(element.version)) {
+                    let item = $('<a>', {class: 'collection-item', href: '/okved?id=' + element.id,
+                        target: '_blank', rel: 'noopener noreferrer',
+                        text: element.kindCode + ' ' + element.kindName })
+                    $('#c_' + element.version).append(item);
+                    variables[element.version + "_is_empty"] = false;
+                }
+
+            });
+
+            for (variable in variables){
+                if (variables[variable]) {
+                    var collection = $('#c_' + variable.substring(0, 4));
+                    if (collection.length != 0) {
+                        collection.append('<div><span>Ничего не найдено</span></div>');
+                    }
+                }
             }
         }
 
         $('#button-add').click(function () {
-            window.open('/new_okved?okved_name=' + $('#input-text').val());
+            window.open('/new_okved?okved_name=' + $('#input-text').val(), 'noopener', 'noreferrer');
         })
 
-        $("#title2001").click(function(){
-            if ($("#collection2001").is(":hidden")) {
-                $("#collection2001").slideDown();
-            }
-            else $("#collection2001").hide();
-
-        });
-
-        $("#title2014").click(function(){
-            if ($("#collection2014").is(":hidden")) {
-                $("#collection2014").slideDown();
+        function hide_okveds(version){
+            let collection = $('#c_' + version);
+            if (collection.is(":hidden")) {
+                collection.slideDown();
             }
             else {
-                $("#collection2014").hide();
+                collection.hide();
             }
-        });
-
-        $("#titleSynt").click(function(){
-            if ($("#collectionSynt").is(":hidden")) {
-                $("#collectionSynt").slideDown();
-            }
-            else $("#collectionSynt").hide();
-
-        });
-
+        }
 
         $().ready(function () {
             search();
