@@ -38,15 +38,10 @@ public class OkvedController {
         return result;
     }
 
-    @RequestMapping(value="/last_synt_okved_code", method=GET)
-    public @ResponseBody String lastSyntOkvedCode() {
-        String kind_code = "" + (Integer.parseInt(okvedServiceImpl.findLastSyntheticKindCode()) + 1);
-        return kind_code;
-    }
-
     @GetMapping("/new_okved")
-    public String newOkved(@RequestParam(name = "okved_name") String okved_name, Model model) {
-        model.addAttribute("okved_name", okved_name);
+    public String newOkved(@RequestParam(name = "okved_name") String kind_name, Model model) {
+        model.addAttribute("kind_name", kind_name);
+        model.addAttribute("version", "Синтетический ОКВЭД");
         return "new_okved";
     }
 
@@ -55,23 +50,17 @@ public class OkvedController {
         Okved okved = okvedServiceImpl.findOkvedById(UUID.fromString(id));
         model.addAttribute("kind_code", okved.getKindCode());
         model.addAttribute("kind_name", okved.getKindName());
-        model.addAttribute("version", okved.getVersion());
+        model.addAttribute("version", okved.getVersion().equals("synt") ? "Синтетический ОКВЭД": okved.getVersion());
         model.addAttribute("status", okved.getStatus());
         model.addAttribute("description", (okved.getDescription() != null) ? okved.getDescription() : "");
         model.addAttribute("okved_id", id);
         return "okvedform";
     }
 
-    @GetMapping("/synt_okveds")
-    public @ResponseBody List<Okved> getListSyntOkved() {
-        List<Okved> list = okvedServiceImpl.getSyntOkveds().stream()
-                            .collect(Collectors.toList());
-        return list;
-    }
-
     @PostMapping("/create_okved")
-    public @ResponseBody String addOkved(@RequestParam(name = "okved-name") String okvedName, @RequestParam(name = "description") String description) {
-        return okvedServiceImpl.createOkved(okvedName, description);
+    public @ResponseBody String addOkved(@RequestParam(name = "kind_name") String kind_name, @RequestParam(name = "kind_code") String kind_code,
+                                         @RequestParam(name = "description") String description, @RequestParam(name = "status") Short status) {
+        return okvedServiceImpl.createOkved(kind_name, kind_code, description, status);
     }
 
     @PostMapping("/save_okved")

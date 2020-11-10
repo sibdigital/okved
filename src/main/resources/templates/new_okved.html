@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org/">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Создание ОКВЭДа</title>
@@ -11,62 +11,57 @@
 <body>
     <div class="container">
         <div class="row">
-            <div class="input-field col s2">
-                <label for="okved-name" th:placeholder="top">Порядковый номер</label>
-                <input type="text" id="okved-code" readonly/>
+            <div class="input-field col s6">
+                <input id="kind_code" type="text" class="validate" required>
+                <label for="kind_code">Код</label>
             </div>
-            <div class="input-field col s10">
-                <input type="text" id="okved-name" autocomplete="off" th:value="${okved_name}"/>
-                <label for="okved-name">Введите наименование ОКВЭДа</label>
+            <div class="input-field col s6">
+                <input id="version" type="text" class="validate" th:value="${version}" readonly>
+                <label for="version">Версия</label>
             </div>
             <div class="input-field col s12">
-                <label for="description">Введите описание ОКВЭДа</label>
-                <textarea class="materialize-textarea" id = "description" autocomplete="off"></textarea>
+                <input id="kind_name" type="text" class="validate" th:value="${kind_name}" required>
+                <label for="kind_name">Наименование</label>
+            </div>
+            <div class="input-field col s12">
+                <textarea class="materialize-textarea" id = "description" >
+                </textarea>
+                <label for="description">Описание</label>
+            </div>
+            <div class="col s12" >
+                <label for="radio-group">Статус</label>
+                <div id="radio-group">
+                    <label class="container">
+                        <input type="radio" id="checkbox1" checked="checked" name="radio">
+                        <span class="checkmark"></span>
+                        <b >Работа разрешена</b>
+                    </label><br>
+                    <label class="container">
+                        <input type="radio" id="checkbox0" name="radio">
+                        <span class="checkmark"></span>
+                        <b>Работа приостановлена</b>
+                    </label>
+                </div>
             </div>
             <div class="input-field col s2">
                 <button class="waves-effect waves-light btn" type="button" id="button-create">Создать ОКВЭД</button>
             </div>
         </div>
-
-        <div class="row">
-            <div class="col s12" id="resultSynt">
-                <div class="waves-effect waves-light collection-header" id = "titleSynt">Синтетические ОКВЭДы</div>
-                <div class="collection" id="collectionSynt"></div>
-            </div>
-        </div>
     </div>
 
     <script>
-        $().ready(function () {
-            $.get('/last_synt_okved_code', function (data) {
-                document.getElementById("okved-code").value = data;
-                }
-            );
-            showSyntheticOkveds();
-        })
-
-        function showSyntheticOkveds() {
-            $('#collectionSynt').empty();
-            $.get('/synt_okveds', function (data) {
-                data.forEach(element => {
-                    var id_item = element.id;
-                    let item = $('<div>', { class: 'collection-item', id: id_item});
-                    let span1 = $('<span>',
-                                { text: element.kindCode + ' ' + element.kindName, ondblclick: "openOkvedByDblCSpan()"})
-                    item.append(span1);
-                    if (element.version == 'synt') {
-                        $('#collectionSynt').append(item);
-                    }
-                });
-            })
-        }
-
         $('#button-create').click(function () {
-            if ($("#okved-name").val() != "") {
+            if ($("#kind_code").val() != "" && $("#kind_code").val() != "") {
                 const form = $('#form')[0];
                 const data = new FormData(form);
-                data.append('okved-name', $("#okved-name").val());
-                data.append('description', $("#description").val());
+                data.append('kind_name', $('#kind_name').val());
+                data.append('kind_code', $('#kind_code').val());
+                data.append('description', $('#description').val());
+                if (document.getElementById("checkbox1").checked == true) {
+                    data.append('status', 1);
+                } else {
+                    data.append('status', 0);
+                }
                 $.ajax({
                     type: 'POST',
                     enctype: 'multipart/form-data',
@@ -77,30 +72,25 @@
                     cache: false,
                     success: function (data) {
                         console.log(data);
+                        var name = $('#kind_code').val() + " " + $('#kind_name').val();
+                        clearAll();
+                        alert("ОКВЭД " + name + " сохранен");
                     },
                     error: function (e) {
                         console.log(e);
                     }
                 });
-                window.location.reload();
             }
             else {
-                alert('Введите наименование ОКВЭДа.')
+                alert('Заполните обязательные поля')
             }
-
         })
 
-        function openOkvedByDblCSpan() {
-            var okved_id = window.getSelection().anchorNode.parentElement.parentElement.id;
-            window.open('/okved?id=' + okved_id);
+        function clearAll() {
+            document.getElementById('kind_code').value = '';
+            document.getElementById('kind_name').value = '';
+            document.getElementById('description').value = '';
         }
-
-        $("#titleSynt").click(function(){
-            if ($("#collectionSynt").is(":hidden")) {
-                $("#collectionSynt").slideDown();
-            }
-            else $("#collectionSynt").hide();
-        });
     </script>
 </body>
 </html>

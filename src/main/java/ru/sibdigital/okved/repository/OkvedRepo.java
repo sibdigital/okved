@@ -42,13 +42,7 @@ public interface OkvedRepo extends JpaRepository<Okved, Integer> {
     List<Okved> findBySearchText(@Param("text") String text);
 
     @Query(
-            value = "SELECT kind_code\nFROM okved\nWHERE version ='synt'\nORDER BY kind_code \\:\\:int DESC LIMIT 1",
-            nativeQuery = true
-    )
-    String findLastSyntheticKindCode();
-
-    @Query(
-            value = "select * from okved where version = :version order by kind_code \\:\\:int DESC",
+            value = "select * from okved where version = :version order by kind_code",
             nativeQuery = true
     )
     List<Okved> findOkvedsByVersion(@Param("version") String version);

@@ -104,35 +104,19 @@ public class OkvedServiceImpl implements OkvedService {
         return okvedRepo.findBySearchText(text);
     }
 
-    public String findLastSyntheticKindCode() {
-        return okvedRepo.findLastSyntheticKindCode();
-    }
-
     public Okved findOkvedById(UUID id) {
         return okvedRepo.findOkvedById(id);
     }
 
-    public List<Okved> getSyntOkveds() {
-        return StreamSupport.stream(okvedRepo.findOkvedsByVersion("synt").spliterator(), false)
-                .collect(Collectors.toList());
-    }
-
-    public String createOkved(String okvedName, String description) {
+    public String createOkved(String kind_name, String kind_code, String description, Short status) {
         try {
             Okved newOkved = new Okved();
-            newOkved.setKindName(okvedName);
+            newOkved.setKindCode(kind_code);
+            newOkved.setKindName(kind_name);
             newOkved.setDescription(description);
             newOkved.setVersion("synt");
-            String lastSyntheticKindCode = findLastSyntheticKindCode();
-            String kindCode;
-            if (lastSyntheticKindCode != null) {
-                kindCode = "" + (Integer.parseInt(lastSyntheticKindCode) + 1);
-            } else {
-                kindCode = "1";
-            }
-
-            newOkved.setKindCode(kindCode);
-            newOkved.setPath("synt." + kindCode);
+            newOkved.setPath("synt." + kind_code);
+            newOkved.setStatus(status);
             this.okvedRepo.save(newOkved);
             this.okvedRepo.setTsVectorsById(newOkved.getId());
             return "ОКВЭД добавлен.";

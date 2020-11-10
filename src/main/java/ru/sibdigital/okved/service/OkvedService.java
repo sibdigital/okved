@@ -12,11 +12,9 @@ public interface OkvedService {
 
     List<Okved> findOkvedsBySearchText(String text);
 
-    String findLastSyntheticKindCode();
-
     Okved findOkvedById(UUID id);
 
-    String createOkved(String okvedName, String description);
+    String createOkved(String kind_name, String kind_code, String description, Short status);
 
     String saveOkved(String id, String okvedName, String description, Short status);
 

@@ -15,15 +15,15 @@
                 <label for="okved-code">Код</label>
             </div>
             <div class="input-field col s6">
-                <input id="okved-version" type="text" class="validate" th:value="${version}"readonly>
+                <input id="okved-version" type="text" class="validate" th:value="${version}" readonly>
                 <label for="okved-version">Версия</label>
             </div>
             <div class="input-field col s12">
-                <input id="okved-name" type="text" class="validate" th:value="${kind_name}">
+                <input id="okved-name" type="text" class="validate" th:value="${kind_name}" readonly required>
                 <label for="okved-name">Наименование</label>
             </div>
             <div class="input-field col s12">
-                <textarea class="materialize-textarea" id = "description" th:text="${description}">
+                <textarea class="materialize-textarea" id = "description" th:text="${description}" readonly>
                 </textarea>
                 <label for="description">Описание</label>
             </div>
@@ -58,15 +58,22 @@
         </div>
         <script>
             $().ready(function () {
-                if ($("#status").val() == 1) {
-                    document.getElementById("checkbox1").checked = true;
-                    document.getElementById("checkbox0").checked = false;
+                if ($('#status').val() == 1) {
+                    document.getElementById('checkbox1').checked = true;
+                    document.getElementById('checkbox0').checked = false;
                 }
                 else{
-                    document.getElementById("checkbox1").checked = false;
-                    document.getElementById("checkbox0").checked = true;
+                    document.getElementById('checkbox1').checked = false;
+                    document.getElementById('checkbox0').checked = true;
                 }
-                $("te")
+
+                if ($('#okved-version').val() != '2001' && $('#okved-version').val() != '2014') {
+                    document.getElementById('okved-name').readOnly = false;
+                    document.getElementById('description').readOnly = false;
+                }
+                else {
+                    document.getElementById('button-delete').style.display = "none";
+                }
             })
             $('#button-save').click(function () {
                 const form = $('#form')[0];
