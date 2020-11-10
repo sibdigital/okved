@@ -3,18 +3,18 @@ package ru.sibdigital.okved.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.sibdigital.okved.model.Okved;
 import ru.sibdigital.okved.service.OkvedService;
 import ru.sibdigital.okved.service.OkvedServiceImpl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @Controller
 public class OkvedController {
@@ -38,44 +38,50 @@ public class OkvedController {
         return result;
     }
 
-    @GetMapping({"/new_okved"})
-    public String newOkved() {
+    @RequestMapping(value="/last_synt_okved_code", method=GET)
+    public @ResponseBody String lastSyntOkvedCode() {
+        String kind_code = "" + (Integer.parseInt(okvedServiceImpl.findLastSyntheticKindCode()) + 1);
+        return kind_code;
+    }
+
+    @GetMapping("/new_okved")
+    public String newOkved(@RequestParam(name = "okved_name") String okved_name, Model model) {
+        model.addAttribute("okved_name", okved_name);
         return "new_okved";
     }
 
-    @GetMapping({"/okved"})
+    @GetMapping("/okved")
     public String okvedForm(@RequestParam(name = "id") String id, Model model) {
         Okved okved = okvedServiceImpl.findOkvedById(UUID.fromString(id));
         model.addAttribute("kind_code", okved.getKindCode());
         model.addAttribute("kind_name", okved.getKindName());
-        model.addAttribute("description", okved.getDescription());
+        model.addAttribute("version", okved.getVersion());
+        model.addAttribute("status", okved.getStatus());
+        model.addAttribute("description", (okved.getDescription() != null) ? okved.getDescription() : "");
         model.addAttribute("okved_id", id);
         return "okvedform";
     }
 
-    @GetMapping({"/synt_okveds"})
-    @ResponseBody
-    public List<Okved> getListSyntOkved() {
+    @GetMapping("/synt_okveds")
+    public @ResponseBody List<Okved> getListSyntOkved() {
         List<Okved> list = okvedServiceImpl.getSyntOkveds().stream()
                             .collect(Collectors.toList());
         return list;
     }
 
-    @PostMapping({"/create_okved"})
-    @ResponseBody
-    public String addOkved(@RequestParam(name = "okved-name") String okvedName, @RequestParam(name = "description") String description) {
+    @PostMapping("/create_okved")
+    public @ResponseBody String addOkved(@RequestParam(name = "okved-name") String okvedName, @RequestParam(name = "description") String description) {
         return okvedServiceImpl.createOkved(okvedName, description);
     }
 
-    @PostMapping({"/save_okved"})
-    @ResponseBody
-    public String saveOkved(@RequestParam(name = "okved-id") String id, @RequestParam(name = "okved-name") String okvedName, @RequestParam(name = "description") String description) {
-        return okvedServiceImpl.saveOkved(id, okvedName, description);
+    @PostMapping("/save_okved")
+    public @ResponseBody String saveOkved(@RequestParam(name = "okved-id") String id, @RequestParam(name = "okved-name") String okvedName,
+                                          @RequestParam(name = "description") String description, @RequestParam(name = "status") Short status) {
+        return okvedServiceImpl.saveOkved(id, okvedName, description, status);
     }
 
-    @PostMapping({"/delete_okved"})
-    @ResponseBody
-    public String deleteOkved(@RequestParam(name = "okved-id") String id) {
+    @PostMapping("/delete_okved")
+    public @ResponseBody String deleteOkved(@RequestParam(name = "okved-id") String id) {
         return okvedServiceImpl.deleteOkved(id);
     }
 }

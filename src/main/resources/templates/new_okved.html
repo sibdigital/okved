@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org/">
 <head>
     <meta charset="UTF-8">
-    <title>ОКВЭД. Добавление нового</title>
+    <title>Создание ОКВЭДа</title>
     <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection">
     <script src="js/jquery-3.5.1.min.js"></script>
     <script src="js/materialize.min.js"></script>
@@ -11,18 +11,23 @@
 <body>
     <div class="container">
         <div class="row">
-            <div class="input-field col s12">
-                <input type="text" id="okved-name" autocomplete="off"/>
+            <div class="input-field col s2">
+                <label for="okved-name" th:placeholder="top">Порядковый номер</label>
+                <input type="text" id="okved-code" readonly/>
+            </div>
+            <div class="input-field col s10">
+                <input type="text" id="okved-name" autocomplete="off" th:value="${okved_name}"/>
                 <label for="okved-name">Введите наименование ОКВЭДа</label>
             </div>
-        </div>
             <div class="input-field col s12">
                 <label for="description">Введите описание ОКВЭДа</label>
                 <textarea class="materialize-textarea" id = "description" autocomplete="off"></textarea>
             </div>
-        <div class="input-field col s2">
-            <button class="waves-effect waves-light btn" type="button" id="button-create">Создать ОКВЭД</button>
+            <div class="input-field col s2">
+                <button class="waves-effect waves-light btn" type="button" id="button-create">Создать ОКВЭД</button>
+            </div>
         </div>
+
         <div class="row">
             <div class="col s12" id="resultSynt">
                 <div class="waves-effect waves-light collection-header" id = "titleSynt">Синтетические ОКВЭДы</div>
@@ -33,6 +38,10 @@
 
     <script>
         $().ready(function () {
+            $.get('/last_synt_okved_code', function (data) {
+                document.getElementById("okved-code").value = data;
+                }
+            );
             showSyntheticOkveds();
         })
 
@@ -42,7 +51,8 @@
                 data.forEach(element => {
                     var id_item = element.id;
                     let item = $('<div>', { class: 'collection-item', id: id_item});
-                    let span1 = $('<span>', { text: element.kindCode + ' ' + element.kindName, ondblclick: "openOkvedByDblCSpan()"});
+                    let span1 = $('<span>',
+                                { text: element.kindCode + ' ' + element.kindName, ondblclick: "openOkvedByDblCSpan()"})
                     item.append(span1);
                     if (element.version == 'synt') {
                         $('#collectionSynt').append(item);

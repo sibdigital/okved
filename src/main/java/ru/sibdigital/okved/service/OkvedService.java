@@ -18,7 +18,7 @@ public interface OkvedService {
 
     String createOkved(String okvedName, String description);
 
-    String saveOkved(String id, String okvedName, String description);
+    String saveOkved(String id, String okvedName, String description, Short status);
 
     String deleteOkved(String id);
 }

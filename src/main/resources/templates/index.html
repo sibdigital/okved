@@ -17,7 +17,7 @@
             <div class="input-field col s1">
                 <button class="waves-effect waves-light btn" type="button" id="button-search">Найти</button>
             </div>
-            <button class="waves-effect waves-light btn-small" type="button" id="button-add">Добавить новый ОКВЭД</button>
+            <button class="waves-effect btn" type="button" id="button-add">Добавить новый ОКВЭД</button>
         </div>
         <div class="row">
             <div class="col s12" id="result2001">
@@ -33,6 +33,7 @@
                 <div class="collection" id="collectionSynt"></div>
             </div>
         </div>
+        <div class="row">
     </div>
     <script>
         $('#button-search').click(function () {
@@ -54,9 +55,10 @@
             isSyntEmpty = true;
 
             data.forEach(element => {
-                let item = $('<div>', { class: 'collection-item' });
-                let span = $('<span>', { text: element.kindCode + ' ' + element.kindName });
-                item.append(span);
+                // let item = $('<div>', { class: 'collection-item'});
+                // let span = $('<span>', { text: element.kindCode + ' ' + element.kindName });
+                // item.append(span);
+                let item = $('<a>', {class: 'collection-item', href: '/okved?id=' + element.id, text: element.kindCode + ' ' + element.kindName })
                 if (element.version == '2001') {
                     $('#collection2001').append(item);
                     is2001empty = false;
@@ -83,7 +85,7 @@
         }
 
         $('#button-add').click(function () {
-            window.open('/new_okved');
+            window.open('/new_okved?okved_name=' + $('#input-text').val());
         })
 
         $("#title2001").click(function(){

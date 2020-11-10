@@ -142,11 +142,12 @@ public class OkvedServiceImpl implements OkvedService {
         }
     }
 
-    public String saveOkved(String id, String okvedName, String description) {
+    public String saveOkved(String id, String okvedName, String description, Short status) {
         try {
             Okved okved = okvedRepo.findOkvedById(UUID.fromString(id));
             okved.setKindName(okvedName);
             okved.setDescription(description);
+            okved.setStatus(status);
             okvedRepo.save(okved);
             okvedRepo.setTsVectorsById(okved.getId());
             return "ОКВЭД изменен.";

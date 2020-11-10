@@ -11,39 +11,75 @@
     <div class="container">
         <div class="row">
             <div class="input-field col s6">
-                <input id="okved-version" type="text" class="validate" value="Синтетический ОКВЭД" readonly>
-                <label for="okved-version">Версия</label>
-            </div>
-            <div class="input-field col s6">
                 <input id="okved-code" type="text" class="validate" th:value="${kind_code}" readonly>
                 <label for="okved-code">Код</label>
+            </div>
+            <div class="input-field col s6">
+                <input id="okved-version" type="text" class="validate" th:value="${version}"readonly>
+                <label for="okved-version">Версия</label>
             </div>
             <div class="input-field col s12">
                 <input id="okved-name" type="text" class="validate" th:value="${kind_name}">
                 <label for="okved-name">Наименование</label>
             </div>
             <div class="input-field col s12">
-                <textarea class="materialize-textarea" id = "description" th:field="*{description}">
+                <textarea class="materialize-textarea" id = "description" th:text="${description}">
                 </textarea>
                 <label for="description">Описание</label>
+            </div>
+            <div class="col s12" >
+                <label for="radio-group">Статус</label>
+                <div id="radio-group">
+                    <label class="container">
+                        <input type="radio" id="checkbox1" name="radio">
+                        <span class="checkmark"></span>
+                        <b >Работа разрешена</b>
+                    </label><br>
+                    <label class="container">
+                        <input type="radio" id="checkbox0" name="radio">
+                        <span class="checkmark"></span>
+                        <b>Работа приостановлена</b>
+                    </label>
+                </div>
+
             </div>
             <div class="input-field col s6">
                 <button class="waves-effect waves-light btn" type="button" id="button-save">Сохранить ОКВЭД</button>
             </div>
             <div class="input-field col s6">
-                <button class="waves-effect waves-light btn" type="button" id="button-delete">Удалить ОКВЭД</button>
+                <button class="waves-effect waves-light btn" type="button" style="float: right;" id="button-delete">Удалить ОКВЭД</button>
             </div>
             <div class="input-field col s1">
                 <input id="okved-id" type="text" class="validate" th:value="${okved_id}" hidden="true">
             </div>
+            <div class="input-field col s1">
+                <input id="status" type="text" class="validate" th:value="${status}" hidden="true">
+            </div>
         </div>
         <script>
+            $().ready(function () {
+                if ($("#status").val() == 1) {
+                    document.getElementById("checkbox1").checked = true;
+                    document.getElementById("checkbox0").checked = false;
+                }
+                else{
+                    document.getElementById("checkbox1").checked = false;
+                    document.getElementById("checkbox0").checked = true;
+                }
+                $("te")
+            })
             $('#button-save').click(function () {
                 const form = $('#form')[0];
                 const data = new FormData(form);
                 data.append('okved-id', $("#okved-id").val());
                 data.append('okved-name', $("#okved-name").val());
                 data.append('description', $("#description").val());
+                if (document.getElementById("checkbox1").checked == true) {
+                    data.append('status', 1);
+                }
+                else {
+                    data.append('status', 0);
+                }
                 $.ajax({
                     type: 'POST',
                     enctype: 'multipart/form-data',
