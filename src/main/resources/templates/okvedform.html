@@ -56,6 +56,23 @@
                 <input id="status" type="text" class="validate" th:value="${status}" hidden="true">
             </div>
         </div>
+        <!-- The Modal -->
+        <div id="modalQuestionAboutDelete" class="modal">
+            <div class="modal-content">
+                <p>Вы действительно желаете удалить ОКВЭД?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="modal-close waves-effect waves-green btn-flat" onclick="deleteOkved()">Да</button>
+                <button type="button" class="modal-close waves-effect waves-red btn-flat" onclick="closeModal()">Отмена</button>
+            </div>
+        </div>
+
+        <div id="modalDeleteInfo" class="modal">
+<!--            <div class="modal-content">-->
+                <p>ОКВЭД удален</p><br>
+                <button type="button" class="modal-close waves-effect waves-green btn-flat" onclick="closeWindow()">Ok</button>
+<!--            </div>-->
+        </div>
         <script>
             $().ready(function () {
                 if ($('#status').val() == 1) {
@@ -97,40 +114,57 @@
                     cache: false,
                     success: function (data) {
                         console.log(data);
-                        alert("ОКВЭД сохранен");
+                        M.toast({html:'ОКВЭД сохранен'})
                     },
                     error: function (e) {
                         console.log(e);
-                        alert("Не получилось сохранить ОКВЭД");
+                        M.toast({html:'Не получилось сохранить ОКВЭД'})
                     }
                 });
             })
 
             $('#button-delete').click(function () {
-                if (confirm("Вы действительно желаете удалить ОКВЭД?")) {
-                    const form = $('#form')[0];
-                    const data = new FormData(form);
-                    data.append('okved-id', $("#okved-id").val());
-                    $.ajax({
-                        type: 'POST',
-                        enctype: 'multipart/form-data',
-                        url: '/delete_okved',
-                        data: data,
-                        processData: false,
-                        contentType: false,
-                        cache: false,
-                        success: function (data) {
-                            console.log(data);
-                            alert("ОКВЭД удален");
-                            window.close();
-                        },
-                        error: function (e) {
-                            console.log(e);
-                            alert("Не получилось удалить ОКВЭД");
-                        }
-                    });
-                }
+                modalQuestionAboutDelete.style.display = 'block';
             })
+
+            function deleteOkved() {
+                const form = $('#form')[0];
+                const data = new FormData(form);
+                data.append('okved-id', $("#okved-id").val());
+                $.ajax({
+                    type: 'POST',
+                    enctype: 'multipart/form-data',
+                    url: '/delete_okved',
+                    data: data,
+                    processData: false,
+                    contentType: false,
+                    cache: false,
+                    success: function (data) {
+                        console.log(data);
+                        modalQuestionAboutDelete.style.display = 'none';
+                        modalDeleteInfo.style.display = 'block';
+                        },
+                    error: function (e) {
+                        console.log(e);
+                        M.toast({html:'Не получилось удалить ОКВЭД'})
+                    }
+                }
+                );
+            }
+
+            function closeModal(){
+                modalQuestionAboutDelete.style.display = 'none';
+            }
+
+            function closeWindow(){
+                window.close();
+            }
+
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modalQuestionAboutDelete.style.display = "none";
+                }
+            }
         </script>
     </div>
 </body>
